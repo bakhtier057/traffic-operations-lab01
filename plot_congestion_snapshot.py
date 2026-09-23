@@ -357,3 +357,21 @@ if __name__ == "__main__":
     plot_congestion_snapshot(
         [30, 60, 90, 120]
     )
+
+### Step 2
+data_dir = Path(__file__).resolve().parent
+flow = pd.read_csv(
+        data_dir / "flow.csv",
+        header=None
+    ).to_numpy()
+occupancy = pd.read_csv(
+        data_dir / "occupancy.csv",
+        header=None
+    ).to_numpy()
+flowperhour = flow.copy()
+flowperhour[1:,1:] = flow[1:,1:]*3600/90
+plt.scatter(occupancy[8][1:],flow[8][1:])
+plt.title("Flow vs Occupancy")
+plt.xlabel("Occupancy")
+plt.ylabel("Flow per hour")
+plt.show()
