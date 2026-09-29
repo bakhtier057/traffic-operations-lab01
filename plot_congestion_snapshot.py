@@ -375,3 +375,35 @@ plt.title("Flow vs Occupancy")
 plt.xlabel("Occupancy")
 plt.ylabel("Flow per hour")
 plt.show()
+
+average_flow = np.mean(flowperhour[1:,1:], axis=0)
+average_occupancy = np.mean(occupancy[1:,1:], axis=0)
+links2 = pd.read_csv(
+        data_dir / "links.csv",
+        header=None
+    )
+links2['average_flow'] = average_flow
+links2['average_occupancy'] = average_occupancy
+print(links2)
+plt.scatter(links2['average_occupancy'],links2['average_flow'])
+plt.title("Average Flow vs Average Occupancy")
+plt.xlabel("Average Occupancy")
+plt.ylabel("Average Flow")
+plt.show()
+
+fig, axes = plt.subplots(
+        2,
+        2,
+        figsize=(10,10),
+        squeeze=False
+    )
+plt.title("Average Flow vs Average Occupancy by Region")
+for i in range(1, 5):
+    ax = axes[(i-1)//2, (i-1)%2]
+    ax.scatter(links2['average_occupancy'][links2[5]==i],links2['average_flow'][links2[5]==i])
+    ax.set_title("Region "+str(i))
+    ax.set_xlabel("Average Occupancy")
+    ax.set_ylabel("Average Flow")
+    ax.set_xlim(0, 100)
+    ax.set_ylim(0, 6000)
+plt.show()
