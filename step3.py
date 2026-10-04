@@ -10,7 +10,7 @@ DETECTOR_LENGTH_M = 2.0
 AVERAGE_VEHICLE_LENGTH_M = 5.0
 
 
-def estimate_region_traffic(data_dir=DATA_DIR, excel_path=None):
+def estimate_region_traffic(data_dir=DATA_DIR, csv_path=None):
     links = pd.read_csv(
         data_dir / "links.csv",
         header=None,
@@ -57,12 +57,14 @@ def estimate_region_traffic(data_dir=DATA_DIR, excel_path=None):
         / (AVERAGE_VEHICLE_LENGTH_M + DETECTOR_LENGTH_M)
         * 1000.0
     )
-
+    print(density)
+    dataframedensity = pd.DataFrame(density)
+    dataframedensity.to_csv(data_dir / "density.csv", index=False, header=False)
     regions = links["region"].to_numpy()
     link_lengths = links["length_m"].to_numpy(dtype=float)
     time_min = occupancy_times / 60.0
 
-    if excel_path is not None:
+    if csv_path is not None:
         n_times, n_links = density.shape
         link_density_table = pd.DataFrame(
             {
@@ -78,9 +80,8 @@ def estimate_region_traffic(data_dir=DATA_DIR, excel_path=None):
                 "density_veh_per_km": density.reshape(-1),
             }
         )
-        link_density_table.to_excel(
-            excel_path,
-            sheet_name="Link densities",
+        link_density_table.to_csv(
+            csv_path,
             index=False,
         )
 
@@ -174,12 +175,14 @@ def plot_region_traffic(results):
 
 
 if __name__ == "__main__":
-    excel_path = DATA_DIR / "link_density_estimates.xlsx"
-    regional_results = estimate_region_traffic(excel_path=excel_path)
+    csv_path = DATA_DIR / "link_density_estimates.csv"
+    regional_results = estimate_region_traffic(csv_path=csv_path)
     valid_speeds = regional_results["mean_speed_km_per_h"].dropna()
-    print(f"Link density table saved to: {excel_path}")
+    print(f"Link density table saved to: {csv_path}")
     print(
         "Regional mean speed range: "
         f"{valid_speeds.min():.2f} to {valid_speeds.max():.2f} km/h"
     )
     plot_region_traffic(regional_results)
+    
+    
