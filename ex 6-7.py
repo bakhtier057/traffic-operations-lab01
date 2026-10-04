@@ -24,7 +24,7 @@ nodes = pd.read_csv(
         header=None
     ).to_numpy()
 density = pd.read_csv(
-        data_dir/"traffic-operations-lab01" / "density.csv",
+        data_dir / "density.csv",
         header=None
     ).to_numpy()
 
