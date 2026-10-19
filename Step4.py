@@ -12,7 +12,7 @@ def load_traffic_data():
     links = pd.read_csv(
         data_dir / "links.csv",
         header=None,
-        names=["link_id", "length_km", "lanes", "start_node", "end_node", "region"],
+        names=["link_id", "length_m", "lanes", "start_node", "end_node", "region"],
     )
 
     flow_raw = pd.read_csv(data_dir / "flow.csv", header=None)
@@ -49,15 +49,12 @@ def load_traffic_data():
 
 def compute_link_metrics(links, flow_matrix, occupancy_matrix):
     """Compute accumulation and production per link across time."""
-    lengths = links["length_km"].to_numpy(dtype=float)
+    length_m = links["length_m"].to_numpy(dtype=float)
+    lanes = links["lanes"].to_numpy(dtype=float)
+    density_veh_per_km = (occupancy_matrix / 100.0 * lanes[np.newaxis, :]) / 7.0 * 1000.0
 
-    if np.nanmax(occupancy_matrix) <= 100:
-        density = occupancy_matrix / 100.0
-    else:
-        density = occupancy_matrix
-
-    accumulation = density * lengths[np.newaxis, :]
-    production = flow_matrix * lengths[np.newaxis, :]
+    accumulation = density_veh_per_km * length_m[np.newaxis, :] / 1000.0
+    production = flow_matrix * (3600.0 / 90.0) * length_m[np.newaxis, :] / 1000.0
 
     return accumulation, production
 
